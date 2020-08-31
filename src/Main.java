@@ -59,8 +59,8 @@ public class Main {
         }
         System.out.println();
 
-        System.out.println("[Test] ReizigerDAO.findById(3) geeft de volgende reiziger: ");
-        System.out.println(rdao.findById(3));
+        System.out.println("[Test] ReizigerDAO.findById(2) geeft de volgende reiziger: ");
+        System.out.println(rdao.findById(2));
 
         System.out.println();
 

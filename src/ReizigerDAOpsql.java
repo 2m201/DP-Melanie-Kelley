@@ -6,7 +6,6 @@ import java.sql.*;
 
 import static java.lang.Integer.parseInt;
 
-
 public class ReizigerDAOpsql implements ReizigerDAO  {
     Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
     Statement myStmt = myConn.createStatement();
@@ -38,7 +37,7 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
         PreparedStatement pst = myConn.prepareStatement(q);
 
         try{
-            pst.setString(1, "Gravens");
+            pst.setString(1, "Berends");
             pst.setInt(2, reiziger.getId());
             int mRst = pst.executeUpdate();
             return true;
@@ -114,5 +113,5 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
         }
         return alleReizigers;
     }
-    
+
 }
