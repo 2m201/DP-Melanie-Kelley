@@ -3,6 +3,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ReizigerDAO {
+    Connection myConn = null;
+    ReizigerDAO rdao = null;
+
+    void ReizigerDAOPsql (Connection conn);
 
     boolean save(Reiziger reiziger) throws SQLException; //nieuwe reiziger
     boolean update(Reiziger reiziger) throws SQLException;

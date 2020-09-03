@@ -6,15 +6,7 @@ public class Reiziger {
     private String tussenvoegsel;
     private String achternaam;
     private Date geboortedatum;
-
-    public String toString(){
-        if (tussenvoegsel == null) {
-            return "De reiziger " + voorletters + ". " + achternaam + " met het ID " + id + " is geboren op " + geboortedatum;
-
-        } else {
-            return "De reiziger " + voorletters + ". " + tussenvoegsel + " " + achternaam + " met het ID " + id + " is geboren op " + geboortedatum;
-        }
-    }
+    private Adres adres;
 
     public Reiziger(int i, String v, String t, String a, Date g) {
         id = i;
@@ -22,7 +14,6 @@ public class Reiziger {
         tussenvoegsel = t;
         achternaam = a;
         geboortedatum = g;
-
     }
 
     public int getId(){
@@ -40,6 +31,9 @@ public class Reiziger {
     public Date getGeboortedatum() {
         return geboortedatum;
     }
+    public Adres getAdres() {
+        return adres;
+    }
 
     public void setId(int id) {
         this.id = id;
@@ -55,5 +49,16 @@ public class Reiziger {
     }
     public void setGeboortedatum(Date geboortedatum) {
         this.geboortedatum = geboortedatum;
+    }
+    public void setAdres(Adres adres) {
+        this.adres = adres;
+    }
+
+    public String toString(){
+        if (tussenvoegsel == null) {
+            return "Reiziger {#" + id + " " + voorletters + ". " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "}}";
+        } else {
+            return "Reiziger {#" + id + " " + voorletters + ". "+ tussenvoegsel + " " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "}}";
+        }
     }
 }

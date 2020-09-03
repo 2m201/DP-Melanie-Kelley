@@ -9,8 +9,14 @@ import static java.lang.Integer.parseInt;
 public class ReizigerDAOpsql implements ReizigerDAO  {
     Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
     Statement myStmt = myConn.createStatement();
+    AdresDAOPsql adao = new AdresDAOPsql(myConn);
+
 
     public ReizigerDAOpsql(Connection conn) throws SQLException {
+    }
+    @Override
+    public void ReizigerDAOPsql(Connection conn) {
+
     }
 
     @Override
@@ -58,8 +64,6 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             return true;
         }
         catch(Exception e ) {e.printStackTrace();}
-
-
         return false;
     }
 
@@ -74,6 +78,8 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
 
             while (myRs.next()) {
                 r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
+                Adres a11 = adao.findByReiziger(r1);
+                r1.setAdres(a11);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -94,6 +100,8 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
 
             while (myRs.next()) {
                 r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
+                Adres a11 = adao.findByReiziger(r1);
+                r1.setAdres(a11);
                 alleReizigers.add(r1);
             }
         } catch (Exception e){
@@ -109,6 +117,8 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
 
         while (myRs.next()) {
             Reiziger r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
+            Adres a11 = adao.findByReiziger(r1);
+            r1.setAdres(a11);
             alleReizigers.add(r1);
         }
         return alleReizigers;
