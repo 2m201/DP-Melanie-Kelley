@@ -3,18 +3,25 @@ import java.util.List;
 
 public class Main {
 
+    public Main() throws SQLException {
+    }
+
     public static void main(String[] args) throws SQLException {
-//       testReizigerDAO(new ReizigerDAOpsql(Main.getConnection()));
-       testAdresDAO(new AdresDAOPsql(Main.getConnection()));
+        Connection conn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
+
+//       testReizigerDAO(new ReizigerDAOpsql(conn));
+//       testAdresDAO(new AdresDAOPsql(conn));
+        testOVChipkaartDAO(new OVChipkaartpsql(conn));
+//        System.out.println("i cry");
+
+        conn.close();
     }
 
     private static Connection getConnection() throws SQLException {
-        Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
-        return myConn;
+        return DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
     }
     private static void closeConnection() throws SQLException {
-        Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
-        myConn.close();
+        Main.getConnection().close();
     }
 
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
@@ -121,9 +128,28 @@ public class Main {
 //        Adres a1 = new Adres(6, "3372EN", "3", "Prinses Margrietstraat", "Hardinxveld-Giessendam", melanie);
 //
 //        melanie.setAdres(a1);
+        Main.closeConnection();
+
 
     }
+
+    public static void testOVChipkaartDAO(OVChipkaartDAO odao) throws SQLException {
+        ReizigerDAO rdao = new ReizigerDAOpsql(Main.getConnection());
+
+        System.out.println(rdao.findById(2));
+
+        Main.closeConnection();
+    }
 }
+
+
+
+
+
+
+
+
+
 
 //    public static void main(String[] args) {
 //        int number = 1;

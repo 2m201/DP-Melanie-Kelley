@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Reiziger {
     private int id;
@@ -7,6 +9,7 @@ public class Reiziger {
     private String achternaam;
     private Date geboortedatum;
     private Adres adres;
+    private List<OVChipkaart> alleChipkaarten = new ArrayList<>();
 
     public Reiziger(int i, String v, String t, String a, Date g) {
         id = i;
@@ -54,11 +57,35 @@ public class Reiziger {
         this.adres = adres;
     }
 
+    public boolean addOV(OVChipkaart chipkaart) {
+        try {
+            alleChipkaarten.add(chipkaart);
+            return true;
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean removeOV(OVChipkaart chipkaart) {
+        try {
+            alleChipkaarten.remove(chipkaart);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public String toString(){
         if (tussenvoegsel == null) {
             return "Reiziger {#" + id + " " + voorletters + ". " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "}}";
         } else {
-            return "Reiziger {#" + id + " " + voorletters + ". "+ tussenvoegsel + " " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "}}";
+            return "Reiziger {#" + id + " " + voorletters + ". "+ tussenvoegsel + " " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "} met OVChipkaarten: " + alleChipkaarten+"}";
         }
+    }
+
+    public List<OVChipkaart> getAlleChipkaarten() {
+        return alleChipkaarten;
     }
 }

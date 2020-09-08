@@ -10,7 +10,7 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
     Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
     Statement myStmt = myConn.createStatement();
     AdresDAOPsql adao = new AdresDAOPsql(myConn);
-
+    OVChipkaartpsql odao = new OVChipkaartpsql(myConn);
 
     public ReizigerDAOpsql(Connection conn) throws SQLException {
     }
@@ -30,25 +30,35 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             pst.setString(4, reiziger.getAchternaam());
             pst.setDate(5, (Date) reiziger.getGeboortedatum());
             int rt = pst.executeUpdate();
+
             return true;
         }catch(Exception e) {
             e.printStackTrace();
+        }finally {
+            pst.close();
+            myConn.close();
         }
         return false;
     }
 
     @Override
     public boolean update(Reiziger reiziger)throws SQLException {
-        String q = "UPDATE reiziger SET achternaam=? WHERE reiziger_id =?;";
+        String q = "UPDATE reiziger SET voorletters=?, tussenvoegsel=?, achternaam=?, geboortedatum=? WHERE reiziger_id =?;";
         PreparedStatement pst = myConn.prepareStatement(q);
 
         try{
-            pst.setString(1, "Berends");
-            pst.setInt(2, reiziger.getId());
+            pst.setString(1, "M");
+            pst.setString(2, null);
+            pst.setString(3, "Kelley");
+            pst.setDate(4, Date.valueOf("2001-12-21"));
+            pst.setInt(5, reiziger.getId());
             int mRst = pst.executeUpdate();
             return true;
         } catch(Exception e){
             e.printStackTrace();
+        }finally {
+            pst.close();
+            myConn.close();
         }
         return false;
     }
@@ -61,9 +71,15 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
         try{
             pst.setInt(1, reiziger.getId());
             int myRs = pst.executeUpdate(); // use executeUpdate() instead of executeQuery() when you are not expecting information back (like SELECT)
+            pst.close();
+            myConn.close();
             return true;
         }
-        catch(Exception e ) {e.printStackTrace();}
+        catch(Exception e ) {e.printStackTrace();
+        } finally {
+            pst.close();
+            myConn.close();
+        }
         return false;
     }
 
@@ -79,10 +95,16 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             while (myRs.next()) {
                 r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
                 Adres a11 = adao.findByReiziger(r1);
+
                 r1.setAdres(a11);
             }
+            pst.close();
+            myConn.close();
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            pst.close();
+            myConn.close();
         }
         return r1;
     } // DONE
@@ -104,8 +126,13 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
                 r1.setAdres(a11);
                 alleReizigers.add(r1);
             }
+            pst.close();
+            myConn.close();
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            pst.close();
+            myConn.close();
         }
         return alleReizigers;
     }
@@ -114,12 +141,19 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
     public List<Reiziger> findAll() throws SQLException {
         ArrayList<Reiziger> alleReizigers = new ArrayList<>();
         ResultSet myRs = myStmt.executeQuery("select * from reiziger");
-
-        while (myRs.next()) {
-            Reiziger r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
-            Adres a11 = adao.findByReiziger(r1);
-            r1.setAdres(a11);
-            alleReizigers.add(r1);
+        try {
+            while (myRs.next()) {
+                Reiziger r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
+                Adres a11 = adao.findByReiziger(r1);
+                r1.setAdres(a11);
+                alleReizigers.add(r1);
+                List<OVChipkaart> chipkaarten = odao.findByReiziger(r1);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        } finally {
+            myRs.close();
+            myConn.close();
         }
         return alleReizigers;
     }

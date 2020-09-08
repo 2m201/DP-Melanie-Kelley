@@ -28,25 +28,36 @@ public class AdresDAOPsql implements AdresDAO {
             pst.setString(5, adres.getWoonplaats());
             pst.setInt(6, adres.getReiziger().getId());
             int rt = pst.executeUpdate();
+
             return true;
         }catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            pst.close();
+            myConn.close();
         }
         return false;
     }
 
     @Override
     public boolean update(Adres adres) throws SQLException {
-        String q = "UPDATE adres SET woonplaats=? WHERE adres_id =?;";
+        String q = "UPDATE adres SET woonplaats=?, postcode=?, huisnummer=?, straat=?, WHERE adres_id =?;";
         PreparedStatement pst = myConn.prepareStatement(q);
 
         try{
-            pst.setString(1, "Utrecht");
-            pst.setInt(2, adres.getAdres_id());
+            pst.setString(1, "Hardinxveld-Giessendam");
+            pst.setString(2, "3372EN");
+            pst.setString(3, "10");
+            pst.setString(4, "Akkerstraat");
+            pst.setInt(5, adres.getAdres_id());
             int mRst = pst.executeUpdate();
+
             return true;
         } catch(Exception e){
             e.printStackTrace();
+        }finally {
+            pst.close();
+            myConn.close();
         }
         return false;
     }
@@ -59,9 +70,16 @@ public class AdresDAOPsql implements AdresDAO {
         try{
             pst.setInt(1, adres.getAdres_id());
             int myRs = pst.executeUpdate(); // use executeUpdate() instead of executeQuery() when you are not expecting information back (like SELECT)
+            pst.close();
+            myConn.close();
             return true;
         }
-        catch(Exception e ) {e.printStackTrace();}
+        catch(Exception e ) {
+            e.printStackTrace();
+        }finally {
+            pst.close();
+            myConn.close();
+        }
         return false;
     }
 
@@ -76,9 +94,15 @@ public class AdresDAOPsql implements AdresDAO {
 
             while (myRs.next()) {
                 a1 = new Adres(myRs.getInt("adres_id"), myRs.getString("postcode"), myRs.getString("huisnummer"), myRs.getString("straat"), myRs.getString("woonplaats"), reiziger);
+
             }
+            pst.close();
+            myConn.close();
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            pst.close();
+            myConn.close();
         }
         return a1;
     }
@@ -88,12 +112,18 @@ public class AdresDAOPsql implements AdresDAO {
         rdao = new ReizigerDAOpsql(myConn);
         ArrayList<Adres> alleAdressen = new ArrayList<>();
         ResultSet myRs = myStmt.executeQuery("select * from adres");
-
-        while (myRs.next()) {
-            Reiziger r1 = rdao.findById(myRs.getInt("reiziger_id"));
-            Adres a1 = new Adres(myRs.getInt("adres_id"), myRs.getString("postcode"), myRs.getString("huisnummer"), myRs.getString("straat"), myRs.getString("woonplaats"), r1);
-            r1.setAdres(a1);
-            alleAdressen.add(a1);
+        try {
+            while (myRs.next()) {
+                Reiziger r1 = rdao.findById(myRs.getInt("reiziger_id"));
+                Adres a1 = new Adres(myRs.getInt("adres_id"), myRs.getString("postcode"), myRs.getString("huisnummer"), myRs.getString("straat"), myRs.getString("woonplaats"), r1);
+                r1.setAdres(a1);
+                alleAdressen.add(a1);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            myRs.close();
+            myConn.close();
         }
         return alleAdressen;
     }
@@ -112,8 +142,12 @@ public class AdresDAOPsql implements AdresDAO {
                 a1 = new Adres(myRs.getInt("adres_id"), myRs.getString("postcode"), myRs.getString("huisnummer"), myRs.getString("straat"), myRs.getString("woonplaats"), r1);
                 r1.setAdres(a1);
             }
+
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            pst.close();
+            myConn.close();
         }
         return a1;
     } // DONE
