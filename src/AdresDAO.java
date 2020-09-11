@@ -14,4 +14,7 @@ public interface AdresDAO {
     Adres findByReiziger(Reiziger reiziger) throws SQLException;
     List<Adres> findAll() throws SQLException;
     public Adres findById(int id) throws SQLException;
+
+    void setReizigerDAO(ReizigerDAO r);
+    void setOVChipkaartDAO(OVChipkaartDAO o);
 }

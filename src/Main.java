@@ -3,15 +3,28 @@ import java.util.List;
 
 public class Main {
 
+
     public Main() throws SQLException {
     }
 
     public static void main(String[] args) throws SQLException {
         Connection conn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
+        AdresDAO adao1 = new AdresDAOPsql(conn);
+        OVChipkaartDAO odao = new OVChipkaartpsql(conn);
+        ReizigerDAO rdao = new ReizigerDAOpsql(conn);
+
+        rdao.setAdresDAO(adao1);
+        rdao.setOVChipkaartDAO(odao);
+
+        adao1.setReizigerDAO(rdao);
+        adao1.setOVChipkaartDAO(odao);
+
+        odao.setAdresDAO(adao1);
+        odao.setReizigerDAO(rdao);
 
 //       testReizigerDAO(new ReizigerDAOpsql(conn));
 //       testAdresDAO(new AdresDAOPsql(conn));
-        testOVChipkaartDAO(new OVChipkaartpsql(conn));
+        testOVChipkaartDAO(odao);
 //        System.out.println("i cry");
 
         conn.close();
@@ -74,7 +87,6 @@ public class Main {
         naam = rdao.findById(100).getAchternaam();
         System.out.println(" heeft hij de achternaam " + naam);
 
-        Main.closeConnection();
     }
 
     private static void testAdresDAO(AdresDAO adao) throws SQLException {
@@ -128,17 +140,37 @@ public class Main {
 //        Adres a1 = new Adres(6, "3372EN", "3", "Prinses Margrietstraat", "Hardinxveld-Giessendam", melanie);
 //
 //        melanie.setAdres(a1);
-        Main.closeConnection();
 
 
     }
 
     public static void testOVChipkaartDAO(OVChipkaartDAO odao) throws SQLException {
         ReizigerDAO rdao = new ReizigerDAOpsql(Main.getConnection());
+        AdresDAO adao = new AdresDAOPsql(Main.getConnection());
+        OVChipkaartDAO odao1 = new OVChipkaartpsql(Main.getConnection());
+
+        rdao.setAdresDAO(adao);
+        rdao.setOVChipkaartDAO(odao1);
+
+        adao.setReizigerDAO(rdao);
+        adao.setOVChipkaartDAO(odao1);
+
+        odao1.setReizigerDAO(rdao);
+        odao1.setAdresDAO(adao);
+
+        Reiziger r1 = new Reiziger(5, "M", null, "K", java.sql.Date.valueOf("2001-12-21"));
+        Adres adres = new Adres(45, "3333aa", "12", "ABC", "hier", r1);
+        OVChipkaart o = new OVChipkaart(333, java.sql.Date.valueOf("2001-12-21"), 1, 40, r1 );
+        r1.setAdres(adres);
+        r1.addOV(o);
+        System.out.println(r1.getAdres());
+        System.out.println(r1.getAlleChipkaarten());
 
         System.out.println(rdao.findById(2));
+//        System.out.println(rdao.findAll());
 
         Main.closeConnection();
+
     }
 }
 

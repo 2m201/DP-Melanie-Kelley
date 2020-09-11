@@ -1,5 +1,4 @@
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -7,22 +6,22 @@ import java.sql.*;
 import static java.lang.Integer.parseInt;
 
 public class ReizigerDAOpsql implements ReizigerDAO  {
-    Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
-    Statement myStmt = myConn.createStatement();
-    AdresDAOPsql adao = new AdresDAOPsql(myConn);
-    OVChipkaartpsql odao = new OVChipkaartpsql(myConn);
+    Connection conn;
+    AdresDAO adao;
+    OVChipkaartDAO odao;
 
     public ReizigerDAOpsql(Connection conn) throws SQLException {
+        this.conn = conn;
     }
     @Override
     public void ReizigerDAOPsql(Connection conn) {
-
+        this.conn = conn;
     }
 
     @Override
     public boolean save(Reiziger reiziger) throws SQLException {
         String q = "INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum) values (?, ?, ?, ?, ?);";
-        PreparedStatement pst = myConn.prepareStatement(q);
+        PreparedStatement pst = conn.prepareStatement(q);
         try {
             pst.setInt(1, reiziger.getId());
             pst.setString(2, reiziger.getVoorletters());
@@ -36,7 +35,7 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             e.printStackTrace();
         }finally {
             pst.close();
-            myConn.close();
+            conn.close();
         }
         return false;
     }
@@ -44,13 +43,13 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
     @Override
     public boolean update(Reiziger reiziger)throws SQLException {
         String q = "UPDATE reiziger SET voorletters=?, tussenvoegsel=?, achternaam=?, geboortedatum=? WHERE reiziger_id =?;";
-        PreparedStatement pst = myConn.prepareStatement(q);
+        PreparedStatement pst = conn.prepareStatement(q);
 
         try{
-            pst.setString(1, "M");
-            pst.setString(2, null);
-            pst.setString(3, "Kelley");
-            pst.setDate(4, Date.valueOf("2001-12-21"));
+            pst.setString(1, reiziger.getVoorletters());
+            pst.setString(2, reiziger.getTussenvoegsel());
+            pst.setString(3, reiziger.getAchternaam());
+            pst.setDate(4, (Date) reiziger.getGeboortedatum());
             pst.setInt(5, reiziger.getId());
             int mRst = pst.executeUpdate();
             return true;
@@ -58,7 +57,7 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             e.printStackTrace();
         }finally {
             pst.close();
-            myConn.close();
+            conn.close();
         }
         return false;
     }
@@ -66,19 +65,18 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
     @Override
     public boolean delete(Reiziger reiziger) throws SQLException {
         String q = "DELETE FROM reiziger WHERE reiziger_id= ?;"; // no need for * after delete, DELETE deletes everything already
-        PreparedStatement pst = myConn.prepareStatement(q);
+        PreparedStatement pst = conn.prepareStatement(q);
 
         try{
             pst.setInt(1, reiziger.getId());
             int myRs = pst.executeUpdate(); // use executeUpdate() instead of executeQuery() when you are not expecting information back (like SELECT)
             pst.close();
-            myConn.close();
             return true;
         }
         catch(Exception e ) {e.printStackTrace();
         } finally {
             pst.close();
-            myConn.close();
+            conn.close();
         }
         return false;
     }
@@ -87,24 +85,22 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
     public Reiziger findById(int id) throws SQLException {
         Reiziger r1 = null;
         String q = "SELECT * FROM reiziger WHERE reiziger_id = ?;";
-        PreparedStatement pst = myConn.prepareStatement(q);
+        PreparedStatement pst = conn.prepareStatement(q);
         try{
             pst.setInt(1, id);
             ResultSet myRs= pst.executeQuery();
 
             while (myRs.next()) {
                 r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
-                Adres a11 = adao.findByReiziger(r1);
-
-                r1.setAdres(a11);
+                r1.setAdres(adao.findByReiziger(r1));
+                List<OVChipkaart> kaart = odao.findByReiziger(r1);
+                r1.addOVChipkaartList(kaart);
             }
-            pst.close();
-            myConn.close();
         } catch (Exception e){
             e.printStackTrace();
         } finally {
             pst.close();
-            myConn.close();
+            conn.close();
         }
         return r1;
     } // DONE
@@ -115,24 +111,23 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
         Reiziger r1 = null;
 
         String q = "SELECT * FROM reiziger WHERE geboortedatum = ?;";
-        PreparedStatement pst = myConn.prepareStatement(q);
+        PreparedStatement pst = conn.prepareStatement(q);
         try{
             pst.setDate(1, java.sql.Date.valueOf(datum));
             ResultSet myRs= pst.executeQuery();
 
             while (myRs.next()) {
                 r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
-                Adres a11 = adao.findByReiziger(r1);
-                r1.setAdres(a11);
+                r1.setAdres(adao.findByReiziger(r1));
+                r1.addOVChipkaartList(odao.findByReiziger(r1));
                 alleReizigers.add(r1);
             }
-            pst.close();
-            myConn.close();
+
         } catch (Exception e){
             e.printStackTrace();
         } finally {
             pst.close();
-            myConn.close();
+            conn.close();
         }
         return alleReizigers;
     }
@@ -140,22 +135,34 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
     @Override
     public List<Reiziger> findAll() throws SQLException {
         ArrayList<Reiziger> alleReizigers = new ArrayList<>();
-        ResultSet myRs = myStmt.executeQuery("select * from reiziger");
+        String q = "select * from reiziger;";
+        PreparedStatement pst =conn.prepareStatement(q);
+
         try {
+            ResultSet myRs= pst.executeQuery();
             while (myRs.next()) {
                 Reiziger r1 = new Reiziger(parseInt(myRs.getString("reiziger_id")), myRs.getString("voorletters"), myRs.getString("tussenvoegsel"), myRs.getString("achternaam"), Date.valueOf(myRs.getString("geboortedatum")));
-                Adres a11 = adao.findByReiziger(r1);
-                r1.setAdres(a11);
+                r1.setAdres(adao.findByReiziger(r1));
+                r1.addOVChipkaartList(odao.findByReiziger(r1));
                 alleReizigers.add(r1);
-                List<OVChipkaart> chipkaarten = odao.findByReiziger(r1);
+
             }
         } catch(Exception e) {
             e.printStackTrace();
         } finally {
-            myRs.close();
-            myConn.close();
+            conn.close();
         }
         return alleReizigers;
+    }
+
+    @Override
+    public void setAdresDAO(AdresDAO a) {
+        this.adao = a;
+    }
+
+    @Override
+    public void setOVChipkaartDAO(OVChipkaartDAO o) {
+        this.odao = o;
     }
 
 }

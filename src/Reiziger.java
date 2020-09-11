@@ -9,7 +9,7 @@ public class Reiziger {
     private String achternaam;
     private Date geboortedatum;
     private Adres adres;
-    private List<OVChipkaart> alleChipkaarten = new ArrayList<>();
+    private List<OVChipkaart> alleChipkaarten;
 
     public Reiziger(int i, String v, String t, String a, Date g) {
         id = i;
@@ -17,6 +17,7 @@ public class Reiziger {
         tussenvoegsel = t;
         achternaam = a;
         geboortedatum = g;
+        alleChipkaarten = new ArrayList<>(); //need to initialize otherwise it'll  result in NullPointerException
     }
 
     public int getId(){
@@ -56,6 +57,9 @@ public class Reiziger {
     public void setAdres(Adres adres) {
         this.adres = adres;
     }
+    public void addOVChipkaartList(List<OVChipkaart> list) {
+        alleChipkaarten.addAll(list);
+    }
 
     public boolean addOV(OVChipkaart chipkaart) {
         try {
@@ -79,9 +83,9 @@ public class Reiziger {
 
     public String toString(){
         if (tussenvoegsel == null) {
-            return "Reiziger {#" + id + " " + voorletters + ". " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "}}";
+            return "Reiziger {#" + id + " " + voorletters + ". " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "} " + alleChipkaarten + "}";
         } else {
-            return "Reiziger {#" + id + " " + voorletters + ". "+ tussenvoegsel + " " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "} met OVChipkaarten: " + alleChipkaarten+"}";
+            return "Reiziger {#" + id + " " + voorletters + ". "+ tussenvoegsel + " " + achternaam + ", geb. " + geboortedatum + ", " + "Adres {#" + adres.getAdres_id() + " " + adres.getStraat() + " " + adres.getHuisnummer() + ", " + adres.getWoonplaats() + " " + adres.getPostcode() + "} "+alleChipkaarten + " }";
         }
     }
 

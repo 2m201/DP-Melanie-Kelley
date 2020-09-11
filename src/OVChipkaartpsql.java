@@ -2,20 +2,18 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Integer.parseInt;
-
 public class OVChipkaartpsql implements OVChipkaartDAO {
-    Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
-    Statement myStmt = myConn.createStatement();
-    ReizigerDAOpsql rdao = new ReizigerDAOpsql(myConn);
-    AdresDAOPsql adao = new AdresDAOPsql(myConn);
+    Connection conn;
+    ReizigerDAO rdao;
+    AdresDAO adao;
 
     public OVChipkaartpsql(Connection connection) throws SQLException {
+        this.conn = connection;
     }
 
     @Override
     public void OVChipkaartDAO(Connection conn) {
-
+        this.conn = conn;
     }
 
     @Override
@@ -40,18 +38,27 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
 
     @Override
     public List<OVChipkaart> findall() throws SQLException {
-        ArrayList<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
-        ResultSet myRs = myStmt.executeQuery("select * from ov_chipkaart");
+        List<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
+        String q = "select * from ov_chipkaart;";
+        PreparedStatement pst = conn.prepareStatement(q);
 
-        while (myRs.next()) {
-            Reiziger r1 = rdao.findById(myRs.getInt("reiziger_id"));
+        try {
+            ResultSet myRs= pst.executeQuery();
+            while (myRs.next()) {
+                Reiziger r1 = rdao.findById(myRs.getInt("reiziger_id"));
 
-            OVChipkaart ov1 = new OVChipkaart(myRs.getInt("kaart_nummer"), myRs.getDate("geldig_tot"), myRs.getInt("klasse"), myRs.getInt("saldo"), r1);
-            r1.addOV(ov1);
-            alleOVChipkaarten.add(ov1);
+                OVChipkaart ov1 = new OVChipkaart(myRs.getInt("kaart_nummer"), myRs.getDate("geldig_tot"), myRs.getInt("klasse"), myRs.getInt("saldo"), r1);
+                Adres a11 = adao.findByReiziger(r1);
+                r1.setAdres(a11);
+
+                r1.addOV(ov1);
+                alleOVChipkaarten.add(ov1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
         }
-        myRs.close();
-        myConn.close();
         return alleOVChipkaarten;
     }
 
@@ -59,25 +66,35 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
     public List<OVChipkaart> findByReiziger(Reiziger reiziger) throws SQLException {
         ArrayList<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
         String q = "SELECT * FROM ov_chipkaart WHERE reiziger_id = ?;";
-        PreparedStatement pst = myConn.prepareStatement(q);
+        PreparedStatement pst = conn.prepareStatement(q);
         try {
             pst.setInt(1, reiziger.getId());
             ResultSet myRs = pst.executeQuery();
 
             while (myRs.next()) {
-                Reiziger r1 = rdao.findById(myRs.getInt("reiziger_id"));
-
-                OVChipkaart ov1 = new OVChipkaart(myRs.getInt("kaart_nummer"), myRs.getDate("geldig_tot"), myRs.getInt("klasse"), myRs.getInt("saldo"), r1);
-                r1.addOV(ov1);
+                OVChipkaart ov1 = new OVChipkaart(myRs.getInt("kaart_nummer"), myRs.getDate("geldig_tot"), myRs.getInt("klasse"), myRs.getInt("saldo"), reiziger);
+                Adres a11 = adao.findByReiziger(reiziger);
+                reiziger.setAdres(a11);
+                reiziger.addOV(ov1);
                 alleOVChipkaarten.add(ov1);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            pst.close();
+            conn.close();
         }
-        pst.close();
-        myConn.close();
         return alleOVChipkaarten;
+    }
 
+    @Override
+    public void setAdresDAO(AdresDAO a) {
+        this.adao = a;
+    }
+
+    @Override
+    public void setReizigerDAO(ReizigerDAO r) {
+        this.rdao = r;
     }
 }
