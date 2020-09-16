@@ -20,7 +20,6 @@ public class Main {
             adao1.setReizigerDAO(rdao);
             adao1.setOVChipkaartDAO(odao);
 
-            odao.setAdresDAO(adao1);
             odao.setReizigerDAO(rdao);
 
 //       testReizigerDAO(new ReizigerDAOpsql(conn));
@@ -157,7 +156,7 @@ public class Main {
 
         List<OVChipkaart> ov = odao.findall();
 
-        System.out.println("[Test] OVChipkaartDAO.findAll() geeft de volgende adressen:");
+        System.out.println("[Test] OVChipkaartDAO.findAll() geeft de volgende ovchipkaarten:");
         for (OVChipkaart r : ov) {
             System.out.println(r);
         }
