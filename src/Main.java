@@ -206,6 +206,8 @@ public class Main {
             System.out.println(ow);
         }
 
+        odao.delete(oiw);
+
 
 
         Main.closeConnection();
