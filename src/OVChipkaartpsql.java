@@ -5,7 +5,6 @@ import java.util.List;
 public class OVChipkaartpsql implements OVChipkaartDAO {
     Connection conn;
     ReizigerDAO rdao;
-    AdresDAO adao;
 
     public OVChipkaartpsql(Connection connection) throws SQLException {
         this.conn = connection;
@@ -122,18 +121,8 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
     }
 
     @Override
-    public void setAdresDAO(AdresDAO a) {
-        this.adao = a;
-    }
-
-    @Override
     public void setReizigerDAO(ReizigerDAO r) {
         this.rdao = r;
-    }
-
-    @Override
-    public AdresDAO getAdresDAO() {
-        return adao;
     }
 
     @Override

@@ -13,11 +13,8 @@ public interface OVChipkaartDAO {
     List<OVChipkaart> findall() throws SQLException;
     List<OVChipkaart> findByReiziger(Reiziger reiziger) throws SQLException;
 
-
-    void setAdresDAO(AdresDAO a);
     void setReizigerDAO(ReizigerDAO r);
 
-    AdresDAO getAdresDAO();
     ReizigerDAO getReizigerDAO();
 
 
