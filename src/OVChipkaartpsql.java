@@ -19,7 +19,7 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
     @Override
     public boolean save(OVChipkaart chipkaart) throws SQLException {
         String q = "INSERT INTO ov_chipkaart (kaart_nummer, geldig_tot, klasse, saldo, reiziger_id) values (?, ?, ?, ?, ?);";
-        PreparedStatement pst = myConn.prepareStatement(q);
+        PreparedStatement pst = conn.prepareStatement(q);
         try {
             pst.setInt(1, chipkaart.getKaart_nummer());
             pst.setDate(2, (Date) chipkaart.getGeldig_tot());
@@ -27,11 +27,50 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
             pst.setInt(4, chipkaart.getSaldo());
             pst.setInt(5, chipkaart.getReiziger().getId());
             int rt = pst.executeUpdate();
-            pst.close();
-            myConn.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally{
+            pst.close();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean delete(OVChipkaart ov) throws SQLException {
+        String q = "DELETE FROM ov_chipkaart WHERE kaart_nummer= ?;"; // no need for * after delete, DELETE deletes everything already
+        PreparedStatement pst = conn.prepareStatement(q);
+
+        try{
+            pst.setInt(1, ov.getKaart_nummer());
+            int myRs = pst.executeUpdate(); // use executeUpdate() instead of executeQuery() when you are not expecting information back (like SELECT)
+            pst.close();
+            return true;
+        }
+        catch(Exception e ) {e.printStackTrace();
+        } finally {
+            pst.close();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean update(OVChipkaart ov)throws SQLException {
+        String q = "UPDATE ov_chipkaart SET geldig_tot=?, klasse=?, saldo=?, reiziger_id=? WHERE kaart_nummer =?;";
+        PreparedStatement pst = conn.prepareStatement(q);
+
+        try{
+            pst.setDate(1, (Date) ov.getGeldig_tot());
+            pst.setInt(2, ov.getKlasse());
+            pst.setInt(3, ov.getSaldo());
+            pst.setInt(4, ov.getReiziger().getId());
+            pst.setInt(5, ov.getKaart_nummer());
+            int mRst = pst.executeUpdate();
+            return true;
+        } catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            pst.close();
         }
         return false;
     }
@@ -48,16 +87,13 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
                 Reiziger r1 = rdao.findById(myRs.getInt("reiziger_id"));
 
                 OVChipkaart ov1 = new OVChipkaart(myRs.getInt("kaart_nummer"), myRs.getDate("geldig_tot"), myRs.getInt("klasse"), myRs.getInt("saldo"), r1);
-                Adres a11 = adao.findByReiziger(r1);
-                r1.setAdres(a11);
 
-                r1.addOV(ov1);
                 alleOVChipkaarten.add(ov1);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            conn.close();
+            pst.close();
         }
         return alleOVChipkaarten;
     }
@@ -73,9 +109,7 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
 
             while (myRs.next()) {
                 OVChipkaart ov1 = new OVChipkaart(myRs.getInt("kaart_nummer"), myRs.getDate("geldig_tot"), myRs.getInt("klasse"), myRs.getInt("saldo"), reiziger);
-                Adres a11 = adao.findByReiziger(reiziger);
-                reiziger.setAdres(a11);
-                reiziger.addOV(ov1);
+
                 alleOVChipkaarten.add(ov1);
             }
 
@@ -83,7 +117,6 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
             e.printStackTrace();
         } finally {
             pst.close();
-            conn.close();
         }
         return alleOVChipkaarten;
     }
@@ -97,4 +130,16 @@ public class OVChipkaartpsql implements OVChipkaartDAO {
     public void setReizigerDAO(ReizigerDAO r) {
         this.rdao = r;
     }
+
+    @Override
+    public AdresDAO getAdresDAO() {
+        return adao;
+    }
+
+    @Override
+    public ReizigerDAO getReizigerDAO() {
+        return rdao;
+    }
+
+
 }

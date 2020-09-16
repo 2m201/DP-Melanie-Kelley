@@ -35,7 +35,6 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             e.printStackTrace();
         }finally {
             pst.close();
-            conn.close();
         }
         return false;
     }
@@ -57,7 +56,6 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             e.printStackTrace();
         }finally {
             pst.close();
-            conn.close();
         }
         return false;
     }
@@ -76,7 +74,6 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
         catch(Exception e ) {e.printStackTrace();
         } finally {
             pst.close();
-            conn.close();
         }
         return false;
     }
@@ -100,7 +97,6 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             e.printStackTrace();
         } finally {
             pst.close();
-            conn.close();
         }
         return r1;
     } // DONE
@@ -127,7 +123,6 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
             e.printStackTrace();
         } finally {
             pst.close();
-            conn.close();
         }
         return alleReizigers;
     }
@@ -150,7 +145,7 @@ public class ReizigerDAOpsql implements ReizigerDAO  {
         } catch(Exception e) {
             e.printStackTrace();
         } finally {
-            conn.close();
+            pst.close();
         }
         return alleReizigers;
     }

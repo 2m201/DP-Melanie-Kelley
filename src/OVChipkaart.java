@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class OVChipkaart {
     private int kaart_nummer;
@@ -6,6 +8,7 @@ public class OVChipkaart {
     private int klasse;
     private int saldo;
     private Reiziger reiziger;
+    private List<Product> alleProducten;
 
     public OVChipkaart(int kn, Date gt, int k, int s, Reiziger r) {
         kaart_nummer = kn;
@@ -13,6 +16,7 @@ public class OVChipkaart {
         klasse = k;
         saldo = s;
         reiziger = r;
+        alleProducten = new ArrayList<>();
     }
 
     public int getKaart_nummer() {
@@ -46,6 +50,27 @@ public class OVChipkaart {
     public void setReiziger(Reiziger reiziger) {
         this.reiziger = reiziger;
     }
+
+    public boolean addProduct(Product p) {
+        try {
+            alleProducten.add(p);
+            return true;
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean removeProduct(Product p) {
+        try {
+            alleProducten.remove(p);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     @Override
     public String toString() {

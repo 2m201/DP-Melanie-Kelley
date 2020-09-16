@@ -35,7 +35,6 @@ public class AdresDAOPsql implements AdresDAO {
             e.printStackTrace();
         } finally {
             pst.close();
-            conn.close();
         }
         return false;
     }
@@ -58,7 +57,6 @@ public class AdresDAOPsql implements AdresDAO {
             e.printStackTrace();
         }finally {
             pst.close();
-            conn.close();
         }
         return false;
     }
@@ -71,15 +69,12 @@ public class AdresDAOPsql implements AdresDAO {
         try{
             pst.setInt(1, adres.getAdres_id());
             int myRs = pst.executeUpdate(); // use executeUpdate() instead of executeQuery() when you are not expecting information back (like SELECT)
-            pst.close();
-            conn.close();
             return true;
         }
         catch(Exception e ) {
             e.printStackTrace();
         }finally {
             pst.close();
-            myConn.close();
         }
         return false;
     }
@@ -100,7 +95,6 @@ public class AdresDAOPsql implements AdresDAO {
             e.printStackTrace();
         } finally {
             pst.close();
-            conn.close();
         }
         return a1;
     }
@@ -122,7 +116,7 @@ public class AdresDAOPsql implements AdresDAO {
         }catch (Exception e) {
             e.printStackTrace();
         } finally {
-            conn.close();
+            pst.close();
         }
         return alleAdressen;
     }
@@ -146,7 +140,6 @@ public class AdresDAOPsql implements AdresDAO {
             e.printStackTrace();
         } finally {
             pst.close();
-            conn.close();
         }
         return a1;
     } // DONE

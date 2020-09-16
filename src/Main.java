@@ -9,25 +9,28 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
         Connection conn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
-        AdresDAO adao1 = new AdresDAOPsql(conn);
-        OVChipkaartDAO odao = new OVChipkaartpsql(conn);
-        ReizigerDAO rdao = new ReizigerDAOpsql(conn);
+        try {
+            AdresDAO adao1 = new AdresDAOPsql(conn);
+            OVChipkaartDAO odao = new OVChipkaartpsql(conn);
+            ReizigerDAO rdao = new ReizigerDAOpsql(conn);
 
-        rdao.setAdresDAO(adao1);
-        rdao.setOVChipkaartDAO(odao);
+            rdao.setAdresDAO(adao1);
+            rdao.setOVChipkaartDAO(odao);
 
-        adao1.setReizigerDAO(rdao);
-        adao1.setOVChipkaartDAO(odao);
+            adao1.setReizigerDAO(rdao);
+            adao1.setOVChipkaartDAO(odao);
 
-        odao.setAdresDAO(adao1);
-        odao.setReizigerDAO(rdao);
+            odao.setAdresDAO(adao1);
+            odao.setReizigerDAO(rdao);
 
 //       testReizigerDAO(new ReizigerDAOpsql(conn));
 //       testAdresDAO(new AdresDAOPsql(conn));
-        testOVChipkaartDAO(odao);
-//        System.out.println("i cry");
-
-        conn.close();
+            testOVChipkaartDAO(odao);
+        } catch(Exception e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
+        }
     }
 
     private static Connection getConnection() throws SQLException {
@@ -145,43 +148,70 @@ public class Main {
     }
 
     public static void testOVChipkaartDAO(OVChipkaartDAO odao) throws SQLException {
-        ReizigerDAO rdao = new ReizigerDAOpsql(Main.getConnection());
-        AdresDAO adao = new AdresDAOPsql(Main.getConnection());
-        OVChipkaartDAO odao1 = new OVChipkaartpsql(Main.getConnection());
-
-        rdao.setAdresDAO(adao);
-        rdao.setOVChipkaartDAO(odao1);
-
-        adao.setReizigerDAO(rdao);
-        adao.setOVChipkaartDAO(odao1);
-
-        odao1.setReizigerDAO(rdao);
-        odao1.setAdresDAO(adao);
 
         Reiziger r1 = new Reiziger(5, "M", null, "K", java.sql.Date.valueOf("2001-12-21"));
         Adres adres = new Adres(45, "3333aa", "12", "ABC", "hier", r1);
         OVChipkaart o = new OVChipkaart(333, java.sql.Date.valueOf("2001-12-21"), 1, 40, r1 );
         r1.setAdres(adres);
         r1.addOV(o);
-        System.out.println(r1.getAdres());
-        System.out.println(r1.getAlleChipkaarten());
 
-        System.out.println(rdao.findById(2));
-//        System.out.println(rdao.findAll());
+        List<OVChipkaart> ov = odao.findall();
+
+        System.out.println("[Test] OVChipkaartDAO.findAll() geeft de volgende adressen:");
+        for (OVChipkaart r : ov) {
+            System.out.println(r);
+        }
+
+
+        System.out.println();
+
+        System.out.println("[Test] OVChipkaartDAO.findByReiziger() geeft het volgende: ");
+        for (OVChipkaart r :odao.findByReiziger(r1) ) {
+            System.out.println(r);
+        }
+
+        System.out.println();
+
+        System.out.println("[Test] Eerst " + ov.size() + " chipkaarten, na OVChipkaart.save() ");
+        odao.save(o);
+        ov = odao.findall();
+        System.out.println(ov.size() + " chipkaarten\n");
+
+        System.out.println();
+
+        System.out.println("[Test] Eerst " + ov.size() + " chipkaarten, na OVChipkaart.delete() ");
+        odao.delete(o);
+        ov = odao.findall();
+        System.out.println(ov.size() + " chipkaarten\n");
+
+        System.out.println();
+
+        OVChipkaart oi = new OVChipkaart(43222, java.sql.Date.valueOf("2222-12-21"), 3, 200, r1 );
+        odao.save(oi);
+        r1.addOV(oi);
+
+
+        System.out.println("[Test] Eerst heeft een reiziger de volgende OVChipkaarten: " );
+        for (OVChipkaart ow : odao.findByReiziger(r1)) {
+            System.out.println(ow);
+        }
+
+        System.out.println();
+
+        System.out.println("na de functie odoa.update() heeft de reiziger de volgende OVChipkaarten:");
+
+        OVChipkaart oiw = new OVChipkaart(43222, java.sql.Date.valueOf("2222-12-21"), 1, 12, r1 );
+        odao.update(oiw);
+        for (OVChipkaart ow : odao.findByReiziger(r1)) {
+            System.out.println(ow);
+        }
+
+
 
         Main.closeConnection();
 
     }
 }
-
-
-
-
-
-
-
-
-
 
 //    public static void main(String[] args) {
 //        int number = 1;
