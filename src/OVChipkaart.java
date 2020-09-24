@@ -74,13 +74,20 @@ public class OVChipkaart {
 
     @Override
     public String toString() {
-        return "OVChipkaart{" +
+        StringBuilder st = new StringBuilder("OVChipkaart: " +
                 "kaart_nummer=" + kaart_nummer +
                 ", geldig_tot=" + geldig_tot +
                 ", klasse=" + klasse +
                 ", saldo=" + saldo +
                 ", reiziger_id=" + reiziger.getId() +
-                '}';
+                ", alleProducten=" );
+
+        for (Product p : alleProducten) {
+            st.append(p) ;
+            st.append(", ");
+        }
+        return st.toString();
+
     }
 }
 

@@ -6,14 +6,14 @@ public class Product {
     private String naam;
     private String beschrijving;
     private int prijs;
-//    private List<OVChipkaart> alleOVChipkaarten;
+    private List<OVChipkaart> alleOVChipkaarten;
 
     public Product (int pn, String n, String b, int p) {
         this.product_nummer = pn;
         this.naam = n;
         this.beschrijving = b;
         this.prijs = p;
-//        alleOVChipkaarten = new ArrayList<>();
+        alleOVChipkaarten = new ArrayList<>();
     }
 
     public int getProduct_nummer() {
@@ -43,23 +43,34 @@ public class Product {
     }
 
 
-//    public boolean addOV(OVChipkaart chipkaart) {
-//        try {
-//            alleOVChipkaarten.add(chipkaart);
-//            return true;
-//
-//        }catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-//    public boolean removeOV(OVChipkaart chipkaart) {
-//        try {
-//            alleOVChipkaarten.remove(chipkaart);
-//            return true;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
+    public boolean addOV(OVChipkaart chipkaart) {
+        try {
+            alleOVChipkaarten.add(chipkaart);
+            return true;
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean removeOV(OVChipkaart chipkaart) {
+        try {
+            alleOVChipkaarten.remove(chipkaart);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+
+        return "Product{" +
+                "product_nummer=" + product_nummer +
+                ", naam='" + naam + '\'' +
+                ", beschrijving='" + beschrijving + '\'' +
+                ", prijs=" + prijs +
+                ", alleOVChipkaarten=";
+    }
 }

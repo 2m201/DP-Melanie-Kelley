@@ -3,16 +3,15 @@ import java.util.List;
 
 public class Main {
 
-
     public Main() throws SQLException {
     }
 
     public static void main(String[] args) throws SQLException {
-        Connection conn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
-        try {
+        try (Connection conn = DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie")) {
             AdresDAO adao1 = new AdresDAOPsql(conn);
             OVChipkaartDAO odao = new OVChipkaartpsql(conn);
             ReizigerDAO rdao = new ReizigerDAOpsql(conn);
+            ProductDAO pdao = new ProductDAOpsql(conn);
 
             rdao.setAdresDAO(adao1);
             rdao.setOVChipkaartDAO(odao);
@@ -21,20 +20,23 @@ public class Main {
             adao1.setOVChipkaartDAO(odao);
 
             odao.setReizigerDAO(rdao);
+            odao.setProductDAO(pdao);
+
+            pdao.setOVChipkaartDAO(odao);
 
 //       testReizigerDAO(new ReizigerDAOpsql(conn));
 //       testAdresDAO(new AdresDAOPsql(conn));
-            testOVChipkaartDAO(odao);
-        } catch(Exception e) {
+//            testOVChipkaartDAO(odao);
+            testProductDAO(pdao);
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            conn.close();
         }
     }
 
     private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:postgresql:ovchip", "userA", "melanie");
     }
+
     private static void closeConnection() throws SQLException {
         Main.getConnection().close();
     }
@@ -212,33 +214,52 @@ public class Main {
         Main.closeConnection();
 
     }
+
+    public static void testProductDAO(ProductDAO pdao) throws SQLException {
+        Product p = new Product(23, "Crying", "Allowed to cry for 5 min", 100);
+        Product p1 = new Product(25, "Screeching", "Allowed to screech for 5 min", 400);
+        Product p2 = new Product(23, "yo", "hee", 3);
+
+        Reiziger r1 = new Reiziger(5, "M", null, "K", java.sql.Date.valueOf("2001-12-21"));
+        OVChipkaart o = new OVChipkaart(333, java.sql.Date.valueOf("2001-12-21"), 1, 40, r1 );
+        OVChipkaart o1 = new OVChipkaart(3456, java.sql.Date.valueOf("2001-12-21"), 2, 40, r1 );
+
+        pdao.save(o, p, "active", java.sql.Date.valueOf("2020-08-07"));
+
+        System.out.println("[Test] pdao.findAll() geeft het volgende: ");
+        for (Product ppp : pdao.findAll()) {
+            System.out.println(ppp);
+        }
+
+        System.out.println();
+
+        System.out.println("[Test] pdao.findByOVChipkaart() geeft het volgende: ");
+        System.out.println(pdao.findByOVChipkaart(o));
+
+        System.out.println();
+        int lengte = pdao.findAll().size();
+
+        System.out.println("[Test] Eerst " + lengte + " aantal producten, na de functie pdao.save() ");
+        pdao.save(o, p1, "yee", java.sql.Date.valueOf("2004-04-04"));
+        lengte = pdao.findAll().size();
+        System.out.println(lengte +  " aantal producten");
+
+        System.out.println("[Test] Eerst " + lengte + " aantal producten, na de functie pdao.delete() ");
+        pdao.delete(p1);
+        lengte = pdao.findAll().size();
+        System.out.println(lengte +  " aantal producten");
+
+        System.out.println();
+
+        System.out.println("[Test] Eerst ziet het product er zo uit: ");
+        System.out.println(pdao.findByOVChipkaart(o));
+        System.out.println(" na de pdao.update() functie ziet het product er zo uit: ");
+        pdao.update(o, p2, "active", java.sql.Date.valueOf("2001-12-21"));
+        System.out.println(pdao.findByOVChipkaart(o));
+
+        pdao.delete(p);
+
+
+    }
 }
 
-//    public static void main(String[] args) {
-//        int number = 1;
-//
-//        try{
-//            //1. Get connection to database
-//            Connection myConn = DriverManager.getConnection("jdbc:postgresql:ovchip", "melanie", "Cookie20012");
-//            //2. Create a statement
-//            Statement myStmt = myConn.createStatement();
-//            //3. Execute SQL query
-//            ResultSet myRs = myStmt.executeQuery("select * from reiziger");
-//            //4. Process result set
-//
-//            System.out.println("Alle reizigers: ");
-//            while (myRs.next()) {
-//                if (myRs.getString("tussenvoegsel") == null) {
-//                    System.out.println("#"+ number + ": " + myRs.getString("voorletters") + ". " + myRs.getString("achternaam") + " (" + myRs.getString("geboortedatum") + ")");
-//
-//                } else {
-//                    System.out.println("#"+ number + ": " + myRs.getString("voorletters") + ". "  + myRs.getString("tussenvoegsel") + " "  + myRs.getString("achternaam") + " (" + myRs.getString("geboortedatum") + ")");
-//                }
-//                number +=1;
-//            }
-//
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//
-//    }
